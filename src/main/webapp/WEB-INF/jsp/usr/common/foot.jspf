@@ -20,53 +20,5 @@
    <!-- common.js -->
    <script src="/resource/js/common.js"></script>
    
-   
-     <!-- <script type="text/javascript">
-  $(function(){
-	  function pollForTests() {
-	      $.ajax({
-	        url: '/tests/check',
-	        method: 'GET',
-	        success: function(data) {
-	          var testDropdown = $("div_test .dropdown-menu");
-	          var testsBadge = $("div_test .badge");
-	          testDropdown.empty();
-	          testsBadge.text(data.length);
-	          data.forEach(function(test) {
-	            var testItem = `<a href="${test.name}" class="dropdown-item">
-	                             <div class="hidden">${test.tno}</div>
-	                             <i class="fas fa-envelope mr-2"></i>
-	                             ${test.content}
-	                             <span class="float-right text-muted text-sm">${test.date}</span>
-	                           </a>
-	                           <div class="dropdown-divider"></div>`;
-	            testDropdown.append(testItem);
-	          });
-	        error: function(xhr, status, error) {
-	          alert('An error occurred: ' + error);
-	        }
-	      });
-	    }
-		
-	    
-	    pollForTests()
-	    //setInterval(pollForTests, 5000);
-
-	    function deleteTests() {
-	    	  $.ajax({
-	    	    url: '/tests/delete',
-	    	    type: 'POST',
-	    	    success: function(data) {
-	    	      alert("알림이 삭제되었습니다.");
-	    	      location.reload();
-	    	    },
-	    	    error: function(xhr, status, error) {
-	    	      alert('에러: ' + error);
-	    	    }
-	    	  });
-	    	}
-
-  })
-      </script> -->
 </body>
 </html>

@@ -99,30 +99,22 @@
           </a>
         </li>
         <!-- Alert Menu -->
-        <li class="nav-item dropdown" id="test">
+        <li class="nav-item dropdown" id="notifications">
   <a class="nav-link" data-toggle="dropdown" href="#">
     <i class="far fa-bell"></i>
     <span class="badge badge-warning navbar-badge">
-    ${not empty testsWhereDelstatusIsZeroCount ? testsWhereDelstatusIsZeroCount : '0'}
+    ${not empty notificationsWhereDelstatusIsZeroCount ? notificationsWhereDelstatusIsZeroCount : '0'}
 </span>
   </a>
   <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-    <span class="dropdown-item dropdown-header">
-      ${not empty testsWhereDelstatusIsZeroCount ? testsWhereDelstatusIsZeroCount : '0'} 개의 알림
+    <span class="dropdown-header">
+      ${not empty notificationsWhereDelstatusIsZeroCount ? notificationsWhereDelstatusIsZeroCount : '0'} 개의 알림
     </span>
     <div class="dropdown-divider"></div>
 
     <c:choose>
-  <c:when test="${tests ne null and not empty tests}">
-    <c:forEach var="test" items="${tests}">
-      <a href="${test.name}" class="dropdown-item">
-        <div style="display:none;">${test.tno}</div>
-        <i class="fas fa-envelope mr-2"></i>
-        ${test.content}
-        <span class="float-right text-muted text-sm">${test.date}</span>
-      </a>
-      <div class="dropdown-divider"></div>
-    </c:forEach>
+  <c:when test="${notifications ne null}">
+    <div id="notifications_next"></div>
   </c:when>
   <c:otherwise>
     <a href="#" class="dropdown-item" style="font-size:15px; color:#808080">
@@ -132,53 +124,65 @@
   </c:otherwise>
 </c:choose>
 
-    <button class="dropdown-item dropdown-footer" onclick="deleteTests()">알림 삭제</button>
+    <button class="dropdown-item dropdown-footer" onclick="deleteNotifications()">알림 삭제</button>
   </div>
 
 <script type="text/javascript">
 $(function(){
-    function pollForTests() {
+    function pollForNotifications() {
         $.ajax({
-            url: '/tests/check',
+            url: '/notifications/check',
             method: 'GET',
             success: function(data) {
-                var testsBadge = $(".badge.badge-warning.navbar-badge");
-                var dropdownHeader = $(".dropdown-item.dropdown-header");
+                var notificationsBadge = $(".badge.badge-warning.navbar-badge");
+                var dropdownHeader = $(".dropdown-header");
 
-                testsBadge.text(data.length ? data.length : '0');
+                notificationsBadge.text(data.length ? data.length : '0');
                 dropdownHeader.text((data.length ? data.length : '0') + ' 개의 알림');
 
-                var dropdownDiv = $("#test .dropdown-menu");
-                var dropdownTests = dropdownDiv.find('.dropdown-divider').prevAll(); // All elements before divider
-                dropdownTests.remove(); // Clear old data
-
-                data.forEach(function(test) {
-                    var testItem = `<a href="${test.name}" class="dropdown-item">
-                                    <i class="fas fa-envelope mr-2"></i>
-                                    ${test.content}
-                                    <span class="float-right text-muted text-sm">${test.date}</span>
-                                  </a>
-                                  <div class="dropdown-divider"></div>`;
-	                var testItem = test.content;
-	            	$("#test_next").empty().append(test.content);  
-	                console.log(testItem);
-                    // dropdownHeader.after(testItem); // Insert new items after header
-                });
+                
+                $("#notifications_next").empty();
+                
+                for ( var i = 0; i < data.length; i++ ) {
+	                var notificationItem =$("<a href='${data[i].notification_url}' class='dropdown-item'>"
+	                		+
+					                    "<i class='fas fa-envelope mr-2'>"
+					                    +
+					                    "</i>"
+					                    +
+					                    data[i].notification_body
+					                    +
+					                    "<span class='float-right text-muted text-sm'>"
+					                    +
+					                    data[i].notification_date
+					                    +
+					                    "</span>"
+					                    +
+					                "</a>"
+					                +
+					                "<div class='dropdown-divider'>"+"</div>");
+                
+                
+                	$("#notifications_next").append(notificationItem);
+                	console.log(data[i].notification_body);
+                }
+                
             },
             error: function(xhr, status, error) {
                 alert('An error occurred: ' + error);
             }
         });
     }
+    
+    setInterval(pollForNotifications, 5000);
+    
 
-    setInterval(pollForTests, 5000);
-
-    function deleteTests() {
+    function deleteNotifications() {
         $.ajax({
-            url: '/tests/delete',
+            url: '/notifications/delete',
             type: 'POST',
             success: function(data) {
-                alert("Notification has been deleted.");
+                alert("알림이 삭제되었습니다.");
                 location.reload();
             },
             error: function(xhr, status, error) {
